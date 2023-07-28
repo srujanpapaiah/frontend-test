@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Register from "./Register";
+import Register, { User } from "./Register"; // Import the User interface from Register
 import { useDispatch, useSelector } from "react-redux";
-import { add } from "../store/features/userSlice";
-import { updateUser } from "../store/features/updateSlice";
+import { add, RootState } from "../store/features/userSlice";
+import { updateUser, UpdateState } from "../store/features/updateSlice";
 
-const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
+const Dashboard: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Use the User interface for selectedUser state
 
-  const data = useSelector((state) => state.user);
-  const updateData = useSelector((state) => state.update);
+  const data = useSelector((state: RootState) => state.user); // Use RootState type for useSelector
+  const updateData = useSelector((state: UpdateState) => state.update); // Use UpdateState type for useSelector
 
   const dispatch = useDispatch();
 
@@ -35,9 +35,10 @@ const Dashboard = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   console.log(data);
 
-  const deleteHandle = async (id) => {
+  const deleteHandle = async (id: string) => {
     try {
       const response = await axios.delete(
         `https://dashboardbackend.akashjayaraj.repl.co/user/${id}`
@@ -48,7 +49,7 @@ const Dashboard = () => {
     }
   };
 
-  const updateHandle = async (user) => {
+  const updateHandle = async (user: User) => {
     dispatch(updateUser(user));
     setSelectedUser(user);
   };
@@ -56,7 +57,7 @@ const Dashboard = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data && data[0] ? (
-        data[0].map((user, index) => (
+        data[0].map((user: User, index: number) => (
           <div key={index} className="bg-white shadow-md p-4">
             <div>
               <p className="text-xl font-semibold">

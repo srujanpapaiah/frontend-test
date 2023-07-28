@@ -4,6 +4,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
+// Define types for the form data
+type FormData = {
+  firstName: string;
+  lastName: string;
+  age: number;
+  phoneNumber: string;
+};
+
+// Define the Zod schema for form validation
 const isPhoneNumber = z
   .string()
   .refine((value) => value.length === 10 || value.length === 11, {
@@ -17,14 +26,13 @@ const schema = z.object({
   phoneNumber: isPhoneNumber,
 });
 
-const FormData = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  age: z.number(),
-  phoneNumber: isPhoneNumber,
-});
-
-function Register({ updateHandle, updateUser }) {
+function Register({
+  updateHandle,
+  updateUser,
+}: {
+  updateHandle?: any;
+  updateUser?: any;
+}) {
   console.log(updateUser);
 
   const {
@@ -32,7 +40,7 @@ function Register({ updateHandle, updateUser }) {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -45,7 +53,7 @@ function Register({ updateHandle, updateUser }) {
     }
   }, [updateUser, setValue]);
 
-  const submitData = async (data) => {
+  const submitData = async (data: FormData) => {
     try {
       if (updateUser) {
         await axios.patch(
