@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Register, { User } from "./Register"; // Import the User interface from Register
+import Register, { User } from "./Register";
 import { useDispatch, useSelector } from "react-redux";
 import { add, RootState } from "../store/features/userSlice";
 import { updateUser, UpdateState } from "../store/features/updateSlice";
 
 const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Use the User interface for selectedUser state
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const data = useSelector((state: RootState) => state.user); // Use RootState type for useSelector
-  const updateData = useSelector((state: UpdateState) => state.update); // Use UpdateState type for useSelector
+  const data = useSelector((state: RootState) => state.user);
+  const updateData = useSelector((state: UpdateState) => state.update);
 
   const dispatch = useDispatch();
 

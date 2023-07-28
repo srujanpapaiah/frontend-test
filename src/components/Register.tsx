@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
-// Define types for the form data
 type FormData = {
   firstName: string;
   lastName: string;
@@ -12,7 +11,6 @@ type FormData = {
   phoneNumber: string;
 };
 
-// Define the Zod schema for form validation
 const isPhoneNumber = z
   .string()
   .refine((value) => value.length === 10 || value.length === 11, {
