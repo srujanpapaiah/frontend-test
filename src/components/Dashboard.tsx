@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Register from "./Register.tsx";
+import Register from "./Register";
 import { useDispatch, useSelector } from "react-redux";
-import { add, update } from "../store/features/userSlice.js";
+import { add } from "../store/features/userSlice";
+import { updateUser } from "../store/features/updateSlice";
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(null); // State to store the ID of the selected user
 
   const data = useSelector((state) => state.user);
+  const updateData = useSelector((state) => state.update);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,39 +43,49 @@ const Dashboard = () => {
         `https://dashboardbackend.akashjayaraj.repl.co/user/${id}`
       );
       console.log(`Deleted user with ID ${id}`, response.data);
-      // I have to update the data in the Redux store to reflect the changes
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
 
   const updateHandle = async (user) => {
-    dispatch(update(user));
+    dispatch(updateUser(user));
     setSelectedUser(user);
-    setSelectedUserId(user._id);
   };
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data && data[0] ? (
         data[0].map((user, index) => (
-          <div className="" key={index}>
-            <div className="">
-              <p className="">
+          <div key={index} className="bg-white shadow-md p-4">
+            <div>
+              <p className="text-xl font-semibold">
                 Name: {user.firstName} {user.lastName}
               </p>
               <p>Phone: {user.phoneNumber}</p>
               <p>Age: {user.age}</p>
-              <button onClick={() => deleteHandle(user._id)}>Delete</button>
-              <button onClick={() => updateHandle(user)}>Update</button>
+              <div className="flex justify-end mt-4">
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 mr-2"
+                  onClick={() => deleteHandle(user._id)}
+                >
+                  Delete
+                </button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2"
+                  onClick={() => updateHandle(user)}
+                >
+                  Update
+                </button>
+              </div>
             </div>
           </div>
         ))
       ) : (
         <div>No data available</div>
       )}
-      <Register selectedUser={selectedUser} updateHandle={updateHandle} />
-    </>
+      <Register updateHandle={updateHandle} updateUser={selectedUser} />
+    </div>
   );
 };
 

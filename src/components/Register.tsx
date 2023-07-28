@@ -1,70 +1,62 @@
 import React, { useEffect } from "react";
-import "../App.css";
 import { z, ZodType } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
+const isPhoneNumber = z
+  .string()
+  .refine((value) => value.length === 10 || value.length === 11, {
+    message: "Phone number must have 10 or 11 digits",
+  });
+
+const schema = z.object({
+  firstName: z.string().min(3).max(10).trim(),
+  lastName: z.string().min(3).max(15).trim(),
+  age: z.number().min(18).max(70),
+  phoneNumber: isPhoneNumber,
+});
+
 const FormData = z.object({
   firstName: z.string(),
   lastName: z.string(),
   age: z.number(),
-  phoneNumber: z.number(), // Change to phoneNumber
+  phoneNumber: isPhoneNumber,
 });
 
-const isPhoneNumber = z
-  .number()
-  .refine(
-    (value) => String(value).length === 10 || String(value).length === 11,
-    {
-      message: "Phone number must have 10 or 11 digits",
-    }
-  )
-  .transform(Number); // Transform the phone number to a number type
-
-function Register({ updateHandle, selectedUser }) {
-  const schema: ZodType<FormData> = z.object({
-    firstName: z.string().min(3).max(10),
-    lastName: z.string().min(3).max(10),
-    age: z.number().min(18).max(70),
-    phoneNumber: isPhoneNumber, // Use the custom validation with phoneNumber
-  });
+function Register({ updateHandle, updateUser }) {
+  console.log(updateUser);
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm({
     resolver: zodResolver(schema),
   });
 
   useEffect(() => {
-    if (selectedUser) {
-      // Pre-fill the form with the selected user's data
-      setValue("firstName", selectedUser.firstName);
-      setValue("lastName", selectedUser.lastName);
-      setValue("phoneNumber", selectedUser.phoneNumber); // Change to phoneNumber
-      setValue("age", selectedUser.age);
+    if (updateUser) {
+      setValue("firstName", updateUser.firstName);
+      setValue("lastName", updateUser.lastName);
+      setValue("phoneNumber", updateUser.phoneNumber);
+      setValue("age", updateUser.age);
     }
-  }, [selectedUser, setValue]);
+  }, [updateUser, setValue]);
 
   const submitData = async (data) => {
     try {
-      if (selectedUser) {
-        // If selectedUser is available, it means we are updating
+      if (updateUser) {
         await axios.patch(
-          `https://dashboardbackend.akashjayaraj.repl.co/user/${selectedUser._id}`,
+          `https://dashboardbackend.akashjayaraj.repl.co/user/${updateUser._id}`,
           data
         );
-        // Perform any necessary actions after successful update, e.g., refetch data, show success message, etc.
       } else {
-        // If selectedUser is not available, it means we are creating new data
         await axios.post(
           "https://dashboardbackend.akashjayaraj.repl.co/user/create",
           data
         );
-        // Perform any necessary actions after successful creation, e.g., refetch data, show success message, etc.
       }
       console.log("Data submitted successfully:", data);
     } catch (error) {
@@ -74,37 +66,80 @@ function Register({ updateHandle, selectedUser }) {
 
   return (
     <div className="App">
-      <form onSubmit={handleSubmit(submitData)}>
-        <label>First Name :</label>
-        <input
-          type="text"
-          {...register("firstName")}
-          className="border border-black"
-        />
-        {errors.firstName && <span>{errors.firstName.message}</span>}
-        <label>Last Name :</label>
-        <input
-          type="text"
-          {...register("lastName")}
-          className="border border-black"
-        />
-        {errors.lastName && <span>{errors.lastName.message}</span>}
-        <label>Phone :</label>
-        <input
-          type="number"
-          {...register("phoneNumber", { valueAsNumber: true })} // Change to phoneNumber
-          className="border border-black"
-        />
-        {errors.phoneNumber && <span>{errors.phoneNumber.message}</span>}{" "}
-        {/* Change to phoneNumber */}
-        <label>Age :</label>
-        <input
-          type="number"
-          {...register("age", { valueAsNumber: true })}
-          className="border border-black"
-        />
-        {errors.age && <span>{errors.age.message}</span>}
-        <input type="submit" className="border border-black" />
+      <form
+        onSubmit={handleSubmit(submitData)}
+        className="p-4 max-w-md mx-auto"
+      >
+        <div className="mb-4">
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            First Name:
+          </label>
+          <input
+            type="text"
+            {...register("firstName")}
+            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+          />
+          {errors.firstName && (
+            <span className="text-red-500">{errors.firstName.message}</span>
+          )}
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Last Name:
+          </label>
+          <input
+            type="text"
+            {...register("lastName")}
+            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+          />
+          {errors.lastName && (
+            <span className="text-red-500">{errors.lastName.message}</span>
+          )}
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Phone:
+          </label>
+          <input
+            type="text"
+            {...register("phoneNumber")}
+            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+          />
+          {errors.phoneNumber && (
+            <span className="text-red-500">{errors.phoneNumber.message}</span>
+          )}
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="age"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Age:
+          </label>
+          <input
+            type="number"
+            {...register("age", { valueAsNumber: true })}
+            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+          />
+          {errors.age && (
+            <span className="text-red-500">{errors.age.message}</span>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Submit
+        </button>
       </form>
     </div>
   );
