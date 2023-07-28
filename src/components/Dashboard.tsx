@@ -8,12 +8,12 @@ import { updateUser, UpdateState } from "../store/features/updateSlice";
 const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isUserDeleted, setIsUserDeleted] = useState<boolean>(false);
 
   const data = useSelector((state: RootState) => state.user);
   const updateData = useSelector((state: UpdateState) => state.update);
 
   const dispatch = useDispatch();
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -32,18 +32,13 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  console.log(data);
-
   const deleteHandle = async (id: string) => {
     try {
       const response = await axios.delete(
         `https://dashboardbackend.akashjayaraj.repl.co/user/${id}`
       );
       console.log(`Deleted user with ID ${id}`, response.data);
+      setIsUserDeleted(!isUserDeleted);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -53,6 +48,10 @@ const Dashboard: React.FC = () => {
     dispatch(updateUser(user));
     setSelectedUser(user);
   };
+
+  if (isLoading) {
+    return <p>Loading</p>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
