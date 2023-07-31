@@ -9,7 +9,7 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const data = useSelector((state) => state.user);
+  const data = useSelector((state) => state.user.users);
   const dispatch = useDispatch();
   type User = data;
 
@@ -18,6 +18,7 @@ const Dashboard: React.FC = () => {
       const response = await axios.get(
         "https://dashboardbackend.akashjayaraj.repl.co/users"
       );
+      console.log(response.data.data);
       dispatch(add(response.data.data));
 
       setIsLoading(false);
@@ -59,10 +60,10 @@ const Dashboard: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <p className="text-xl font-semibold mb-4 col-span-full text-center">
-        Total number of users: {data[0].length}
+        Total number of users: {data.length}
       </p>
-      {data && data[0] ? (
-        data[0].map((user: User, index: number) => (
+      {data ? (
+        data.map((user: User, index: number) => (
           <div
             key={index}
             className="bg-white shadow-md p-4 md:w-64 lg:w-72 xl:w-80"
